@@ -148,7 +148,7 @@ def rqr(args):
 def main():
     """does the whole job,
     if we are running in MPI, this is only called by job #0
-    all other jobs are running mpi.slave()
+    all other jobs are running mpi.subordinate()
     """
     argv = sys.argv
     if len(argv) != 2:
@@ -211,7 +211,7 @@ syntax is :
     d1D = d0.col(0)    # template
     xarg = iterarg(indexes, d0, n_of_line, n_of_iter, orda )
     if mpiutil.MPI_size>1:      # means we are running under MPI !
-        mpiutil.mprint('MPI Master job  - starting slave jobs - ')
+        mpiutil.mprint('MPI Main job  - starting subordinate jobs - ')
         res = mpiutil.enum_imap(meth, xarg)    # apply it
         for i,p in res:       # and get results
             d1D.buffer = p
@@ -234,9 +234,9 @@ if __name__ == '__main__':
         main()
     else:                       # this is a MPI run
         print("Running in MPI mode")
-        if mpiutil.MPI_rank == 0:   # master proc
+        if mpiutil.MPI_rank == 0:   # main proc
             main()
-        else:               # slave proc
-            mpiutil.slave()
+        else:               # subordinate proc
+            mpiutil.subordinate()
 
 

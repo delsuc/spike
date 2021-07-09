@@ -16,7 +16,7 @@ in main do :
     if MPI_rank == 0:
         compute()   # your code,     uses mpiutil.enum_imap(myfunction, xarg)
     else:
-        mpiutil.slave()     # slave is a generic function used to compute myfunction( arg )
+        mpiutil.subordinate()     # subordinate is a generic function used to compute myfunction( arg )
 
 create a function to do the processing
 def myfunction(arg)
@@ -33,7 +33,7 @@ and in compute() :
 
 Warning, (i,r) will not arrive in order
 
-Will import even in MPI is not installed, however slave() will not work
+Will import even in MPI is not installed, however subordinate() will not work
 The situation is reported as MPI_size = 1
 
 Created by Marc-Andre' on 2012-04-19.
@@ -97,7 +97,7 @@ def enum_imap(function, iterator):
     # main loop
     for inp in iterator:
         result = False      # assume unproductive loop
-        # first receive from slaves ! (at least ok from initialize)
+        # first receive from subordinates ! (at least ok from initialize)
         data = MPI_comm.recv( source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status)
         worker = status.Get_source()    # who was it ?
         if status.Get_tag() != INIT_TAG:
@@ -123,7 +123,7 @@ def enum_imap(function, iterator):
             done += 1
             yield (ind, data)
     return
-def slave():
+def subordinate():
     "to be called in conjunction with enum_imap"
     if MPI_size == 1:
         raise Exception("program should be started with mpirun")
@@ -153,7 +153,7 @@ def _nill(a):
 def initialize(func=_nill):
     """
     bring all processes to a starting barrier
-    to be called by master process (rank == 0)
+    to be called by main process (rank == 0)
     """
     if MPI_size == 1:
         raise Exception("program should be started with mpirun")
@@ -168,7 +168,7 @@ def initialize(func=_nill):
 def shutdown():
     """
     closes all MPI processes all processes
-    to be called by master process (rank == 0)
+    to be called by main process (rank == 0)
     """
     if MPI_size == 1:
         raise Exception("program should be started with mpirun")
@@ -242,7 +242,7 @@ def test_server_worker():
         print("speed up is x %.2f  for a theoretical maximum speedup of x %d"%(spd, MPI_size-1))
         shutdown()
     else:
-        slave()
+        subordinate()
 
 if __name__ == '__main__':
     # this should be called with mpirun to check the MPI behavior.

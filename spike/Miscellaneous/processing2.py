@@ -589,7 +589,7 @@ if __name__ == '__main__':
     if mpiutil.MPI_size < 2:            # this is single processor
         main()
     else:                       # this is a MPI run
-        if mpiutil.MPI_rank == 0:   # master proc
+        if mpiutil.MPI_rank == 0:   # main proc
             main()
-        else:               # slave proc
-            mpiutil.slave()
+        else:               # subordinate proc
+            mpiutil.subordinate()
